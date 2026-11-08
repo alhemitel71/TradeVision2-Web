@@ -7,240 +7,222 @@
 <title>TradeVision 2.0</title>
 <style>
 *{box-sizing:border-box}
-body{margin:0;background:#080d16;color:#e8edf5;font-family:Arial,sans-serif}
-header{padding:17px;background:#101927;border-bottom:1px solid #263449;display:flex;justify-content:space-between;align-items:center}
-.logo{font-size:21px;font-weight:bold;color:#36b9ff}
-.version{font-size:11px;color:#8494aa}
-main{padding:14px;max-width:1100px;margin:auto}
-h2{font-size:17px;margin:12px 0}
-select,button{background:#172438;color:#e8edf5;border:1px solid #30445d;border-radius:6px;padding:9px}
-.market{display:flex;justify-content:space-between;align-items:center;gap:10px}
-.price{font-size:24px;font-weight:bold;margin-top:8px}
-.demo{font-size:11px;color:#f0b44d;margin-top:7px}
-.tools{display:flex;gap:7px;flex-wrap:wrap;margin:15px 0}
-button.active{background:#087eb8}
-.chartbox{background:#101927;border:1px solid #263449;border-radius:10px;padding:10px}
-canvas{width:100%;height:300px;display:block}
-.indicators{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-.indicators label{font-size:12px;background:#172438;padding:8px;border-radius:6px}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
-.panel{background:#101927;border:1px solid #263449;border-radius:9px;padding:13px}
-.signal{font-size:23px;font-weight:bold;margin:12px 0}
-.buy{color:#20d69b}
-.sell{color:#ff6575}
-.marketrow{display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid #263449;font-size:14px}
-footer{text-align:center;color:#65758a;padding:25px;font-size:11px}
-@media(max-width:600px){.grid{grid-template-columns:1fr}canvas{height:250px}}
+body{
+ margin:0;background:#080d16;color:#e8edf5;
+ font-family:Arial,sans-serif
+}
+header{
+ background:#101827;padding:18px;
+ border-bottom:1px solid #263348;
+ display:flex;justify-content:space-between;
+ align-items:center
+}
+.logo{font-size:23px;font-weight:bold;color:#36b8ff}
+.version{font-size:11px;color:#8192aa}
+main{padding:14px;max-width:1500px;margin:auto}
+.panel{
+ background:#111b2b;border:1px solid #263348;
+ border-radius:10px;padding:14px;margin-bottom:14px
+}
+h3{margin:0 0 12px;font-size:16px}
+select,button{
+ background:#1b2940;color:white;
+ border:1px solid #344763;border-radius:6px;
+ padding:11px;font-size:14px
+}
+.controls{
+ display:flex;gap:8px;flex-wrap:wrap;
+ margin-bottom:12px
+}
+.controls select{flex:1;min-width:110px}
+button{cursor:pointer}
+button:hover{background:#263b59}
+#chart{
+ width:100%;height:570px;
+ border-radius:8px;overflow:hidden
+}
+.grid{
+ display:grid;grid-template-columns:repeat(3,1fr);
+ gap:10px
+}
+.metric{
+ background:#1a2940;padding:14px;border-radius:8px
+}
+.metric small{color:#8ea2bd}
+.metric strong{display:block;margin-top:8px;font-size:19px}
+.buy{color:#00d69b}
+.sell{color:#ff536b}
+.neutral{color:#ffc857}
+footer{
+ color:#71829b;text-align:center;
+ padding:20px;font-size:12px
+}
+@media(max-width:600px){
+ #chart{height:470px}
+ .grid{grid-template-columns:1fr 1fr}
+ header{padding:14px}
+}
 </style>
 </head>
 <body>
 
 <header>
-<div>
-<div class="logo">TradeVision 2.0</div>
-<div class="version">PROFESSIONAL TRADING TERMINAL</div>
-</div>
-<div style="font-size:12px;color:#20d69b">● ONLINE</div>
+ <div>
+  <div class="logo">TradeVision</div>
+  <div class="version">PROFESSIONAL TRADING PLATFORM</div>
+ </div>
+ <div>2.0</div>
 </header>
 
 <main>
 
-<div class="market">
-<div>
-<div style="color:#91a4bb;font-size:13px">Торговый инструмент</div>
-<h2 id="symbol">BTC / USDT</h2>
-</div>
-<select id="marketSelect">
-<option>BTC / USDT</option>
-<option>ETH / USDT</option>
-<option>EUR / USD</option>
-<option>GBP / USD</option>
-<option>GOLD</option>
-<option>NASDAQ</option>
-</select>
-</div>
+<section class="panel">
+ <h3>Рынок и график</h3>
 
-<div class="price" id="price">67,450.00</div>
-<div class="demo">● ДЕМОНСТРАЦИОННЫЕ ДАННЫЕ — НЕ РЫНОЧНЫЕ КОТИРОВКИ</div>
+ <div class="controls">
+  <select id="symbol" onchange="updateChart()">
+   <option value="BINANCE:BTCUSDT">BTC / USDT</option>
+   <option value="BINANCE:ETHUSDT">ETH / USDT</option>
+   <option value="BINANCE:BNBUSDT">BNB / USDT</option>
+   <option value="BINANCE:SOLUSDT">SOL / USDT</option>
+   <option value="OANDA:EURUSD">EUR / USD</option>
+   <option value="OANDA:GBPUSD">GBP / USD</option>
+   <option value="OANDA:XAUUSD">GOLD</option>
+   <option value="NASDAQ:AAPL">APPLE</option>
+   <option value="NASDAQ:NVDA">NVIDIA</option>
+   <option value="NASDAQ:TSLA">TESLA</option>
+   <option value="AMEX:SPY">S&P 500 ETF</option>
+  </select>
 
-<div class="tools">
-<button class="active" data-tf="M1">M1</button>
-<button data-tf="M5">M5</button>
-<button data-tf="M15">M15</button>
-<button data-tf="H1">H1</button>
-<button data-tf="H4">H4</button>
-<button data-tf="D1">D1</button>
-</div>
+  <select id="interval" onchange="updateChart()">
+   <option value="1">1 мин</option>
+   <option value="5">5 мин</option>
+   <option value="15" selected>15 мин</option>
+   <option value="30">30 мин</option>
+   <option value="60">1 час</option>
+   <option value="240">4 часа</option>
+   <option value="D">1 день</option>
+   <option value="W">1 неделя</option>
+  </select>
+ </div>
 
-<div class="chartbox">
-<div style="font-size:13px;color:#91a4bb;margin-bottom:10px">
-ГРАФИК ЦЕНЫ · <span id="timeframe">M1</span>
-</div>
-<canvas id="chart"></canvas>
-<div class="indicators">
-<label><input type="checkbox" id="ema" checked> EMA</label>
-<label><input type="checkbox" id="bb"> Bollinger</label>
-<label><input type="checkbox" id="rsi"> RSI</label>
-<label><input type="checkbox" id="macd"> MACD</label>
-</div>
-<div id="extra" style="font-size:12px;color:#91a4bb;margin-top:12px"></div>
-</div>
+ <div id="chart"></div>
+</section>
 
-<div class="grid">
-<div class="panel">
-<h2>AI Market Analysis</h2>
-<div class="signal buy" id="signal">BUY</div>
-<div style="font-size:12px;color:#91a4bb">
-Демонстрационный сигнал интерфейса.
-Не является торговой рекомендацией.
-</div>
-</div>
+<section class="panel">
+ <h3>Технические индикаторы</h3>
+ <div class="grid">
+  <div class="metric">
+   <small>EMA</small>
+   <strong>20 / 50 / 200</strong>
+  </div>
+  <div class="metric">
+   <small>RSI</small>
+   <strong>RSI 14</strong>
+  </div>
+  <div class="metric">
+   <small>MACD</small>
+   <strong>12 / 26 / 9</strong>
+  </div>
+  <div class="metric">
+   <small>Bollinger Bands</small>
+   <strong>20 / 2</strong>
+  </div>
+  <div class="metric">
+   <small>Volume</small>
+   <strong>Объём</strong>
+  </div>
+  <div class="metric">
+   <small>Fibonacci</small>
+   <strong>Уровни</strong>
+  </div>
+ </div>
+</section>
 
-<div class="panel">
-<h2>Управление рисками</h2>
-<div style="margin:12px 0">
-<label>Stop Loss</label>
-<input id="sl" type="number" placeholder="Цена SL" style="width:100%;margin-top:7px;padding:10px;background:#172438;color:white;border:1px solid #30445d">
-</div>
-<div>
-<label>Take Profit</label>
-<input id="tp" type="number" placeholder="Цена TP" style="width:100%;margin-top:7px;padding:10px;background:#172438;color:white;border:1px solid #30445d">
-</div>
-</div>
-</div>
+<section class="panel">
+ <h3>AI Market Analysis</h3>
+ <div class="metric">
+  <small>Статус анализа</small>
+  <strong class="neutral">Ожидание подключения AI</strong>
+  <p style="color:#91a3bd;font-size:13px">
+   Модуль автоматического анализа, распознавания
+   паттернов и торговых сигналов будет подключён
+   на следующем этапе.
+  </p>
+ </div>
+</section>
 
-<div class="panel" style="margin-top:14px">
-<h2>Избранные рынки</h2>
-<div class="marketrow"><span>BTC / USDT</span><span>Crypto</span></div>
-<div class="marketrow"><span>ETH / USDT</span><span>Crypto</span></div>
-<div class="marketrow"><span>EUR / USD</span><span>Forex</span></div>
-<div class="marketrow"><span>GOLD</span><span>Commodities</span></div>
-<div class="marketrow"><span>NASDAQ</span><span>Index</span></div>
-</div>
+<section class="panel">
+ <h3>Торговые сигналы</h3>
+ <div class="grid">
+  <div class="metric">
+   <small>BUY</small>
+   <strong class="buy">Ожидание</strong>
+  </div>
+  <div class="metric">
+   <small>SELL</small>
+   <strong class="sell">Ожидание</strong>
+  </div>
+ </div>
+ <p style="color:#91a3bd;font-size:12px">
+  Сигналы пока не рассчитываются. Не использовать
+  этот блок для принятия торговых решений.
+ </p>
+</section>
 
 </main>
 
-<footer>TradeVision 2.0 · Professional Trading Interface</footer>
+<footer>
+TradeVision 2.0 | Professional Trading Interface
+</footer>
 
 <script>
-const canvas=document.getElementById("chart");
-const ctx=canvas.getContext("2d");
-let candles=[];
-let currentPrice=67450;
+function updateChart(){
+ const symbol=document.getElementById("symbol").value;
+ const interval=document.getElementById("interval").value;
+ const chart=document.getElementById("chart");
 
-function generateData(){
- candles=[];
- let p=currentPrice;
- for(let i=0;i<65;i++){
-  let open=p;
-  let close=open+(Math.random()-.48)*450;
-  let high=Math.max(open,close)+Math.random()*180;
-  let low=Math.min(open,close)-Math.random()*180;
-  candles.push({open,close,high,low});
-  p=close;
- }
- currentPrice=p;
- document.getElementById("price").textContent=p.toFixed(2);
- draw();
-}
+ chart.innerHTML="";
 
-function draw(){
- const w=canvas.clientWidth;
- const h=canvas.clientHeight;
- const dpr=window.devicePixelRatio||1;
- canvas.width=w*dpr;
- canvas.height=h*dpr;
- ctx.setTransform(dpr,0,0,dpr,0,0);
- ctx.clearRect(0,0,w,h);
+ const container=document.createElement("div");
+ container.style.height="100%";
+ container.style.width="100%";
+ chart.appendChild(container);
 
- let values=candles.flatMap(c=>[c.high,c.low]);
- let max=Math.max(...values);
- let min=Math.min(...values);
- let range=max-min||1;
- const y=v=>h-15-(v-min)/range*(h-30);
+ const script=document.createElement("script");
+ script.src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js";
+ script.async=true;
 
- ctx.strokeStyle="#263449";
- ctx.lineWidth=1;
- for(let i=0;i<5;i++){
-  let yy=15+i*(h-30)/4;
-  ctx.beginPath();
-  ctx.moveTo(0,yy);
-  ctx.lineTo(w,yy);
-  ctx.stroke();
- }
-
- const step=w/candles.length;
- const body=Math.max(2,step*.55);
-
- candles.forEach((c,i)=>{
-  let x=i*step+step/2;
-  let up=c.close>=c.open;
-  let color=up?"#20d69b":"#ff6575";
-  ctx.strokeStyle=color;
-  ctx.fillStyle=color;
-  ctx.beginPath();
-  ctx.moveTo(x,y(c.high));
-  ctx.lineTo(x,y(c.low));
-  ctx.stroke();
-  let top=y(Math.max(c.open,c.close));
-  let bottom=y(Math.min(c.open,c.close));
-  ctx.fillRect(x-body/2,top,body,Math.max(1,bottom-top));
+ script.innerHTML=JSON.stringify({
+  autosize:true,
+  symbol:symbol,
+  interval:interval,
+  timezone:"Etc/UTC",
+  theme:"dark",
+  style:"1",
+  locale:"ru",
+  backgroundColor:"#111b2b",
+  gridColor:"#263348",
+  allow_symbol_change:true,
+  save_image:false,
+  calendar:false,
+  hide_side_toolbar:false,
+  details:true,
+  hotlist:false,
+  withdateranges:true,
+  studies:[
+   "STD;EMA",
+   "STD;RSI",
+   "STD;MACD",
+   "STD;Bollinger_Bands"
+  ],
+  support_host:"https://www.tradingview.com"
  });
 
- if(document.getElementById("ema").checked){
-  ctx.strokeStyle="#36b9ff";
-  ctx.lineWidth=1.5;
-  ctx.beginPath();
-  candles.forEach((c,i)=>{
-   let avg=candles.slice(Math.max(0,i-8),i+1)
-    .reduce((s,v)=>s+v.close,0)/
-    Math.min(i+1,9);
-   let x=i*step+step/2;
-   if(i===0)ctx.moveTo(x,y(avg));
-   else ctx.lineTo(x,y(avg));
-  });
-  ctx.stroke();
- }
-
- if(document.getElementById("bb").checked){
-  ctx.strokeStyle="#b38cff";
-  ctx.setLineDash([4,4]);
-  ctx.beginPath();
-  candles.forEach((c,i)=>{
-   let x=i*step+step/2;
-   let yy=y(c.high+300);
-   if(i===0)ctx.moveTo(x,yy);
-   else ctx.lineTo(x,yy);
-  });
-  ctx.stroke();
-  ctx.setLineDash([]);
- }
-
- document.getElementById("extra").textContent=
-  (document.getElementById("rsi").checked?"RSI: демонстрационный модуль · ":"")+
-  (document.getElementById("macd").checked?"MACD: демонстрационный модуль":"");
+ container.appendChild(script);
 }
 
-document.querySelectorAll("[data-tf]").forEach(btn=>{
- btn.onclick=()=>{
-  document.querySelectorAll("[data-tf]").forEach(b=>b.classList.remove("active"));
-  btn.classList.add("active");
-  document.getElementById("timeframe").textContent=btn.dataset.tf;
-  generateData();
- };
-});
-
-document.getElementById("marketSelect").onchange=e=>{
- document.getElementById("symbol").textContent=e.target.value;
- generateData();
-};
-
-["ema","bb","rsi","macd"].forEach(id=>{
- document.getElementById(id).onchange=draw;
-});
-
-window.addEventListener("resize",draw);
-generateData();
+updateChart();
 </script>
 
 </body>
