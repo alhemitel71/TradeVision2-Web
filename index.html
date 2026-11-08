@@ -7,167 +7,132 @@
 <title>TradeVision 2.0</title>
 <style>
 *{box-sizing:border-box}
-body{
- margin:0;background:#080d16;color:#e8edf5;
- font-family:Arial,sans-serif
-}
-header{
- background:#101827;padding:18px;
- border-bottom:1px solid #263348;
- display:flex;justify-content:space-between;
- align-items:center
-}
+body{margin:0;background:#080d16;color:#e8edf5;font-family:Arial,sans-serif}
+header{background:#101827;padding:18px;border-bottom:1px solid #263348;display:flex;justify-content:space-between;align-items:center}
 .logo{font-size:23px;font-weight:bold;color:#36b8ff}
 .version{font-size:11px;color:#8192aa}
 main{padding:14px;max-width:1500px;margin:auto}
-.panel{
- background:#111b2b;border:1px solid #263348;
- border-radius:10px;padding:14px;margin-bottom:14px
-}
+.panel{background:#111b2b;border:1px solid #263348;border-radius:10px;padding:14px;margin-bottom:14px}
 h3{margin:0 0 12px;font-size:16px}
-select,button{
- background:#1b2940;color:white;
- border:1px solid #344763;border-radius:6px;
- padding:11px;font-size:14px
-}
-.controls{
- display:flex;gap:8px;flex-wrap:wrap;
- margin-bottom:12px
-}
+select{background:#1b2940;color:white;border:1px solid #344763;border-radius:6px;padding:11px;font-size:14px}
+.controls{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
 .controls select{flex:1;min-width:110px}
-button{cursor:pointer}
-button:hover{background:#263b59}
-#chart{
- width:100%;height:570px;
- border-radius:8px;overflow:hidden
-}
-.grid{
- display:grid;grid-template-columns:repeat(3,1fr);
- gap:10px
-}
-.metric{
- background:#1a2940;padding:14px;border-radius:8px
-}
+#chart{width:100%;height:570px;border-radius:8px;overflow:hidden}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.metric{background:#1a2940;padding:14px;border-radius:8px}
 .metric small{color:#8ea2bd}
-.metric strong{display:block;margin-top:8px;font-size:19px}
+.metric strong{display:block;margin-top:8px;font-size:17px}
 .buy{color:#00d69b}
 .sell{color:#ff536b}
 .neutral{color:#ffc857}
-footer{
- color:#71829b;text-align:center;
- padding:20px;font-size:12px
-}
+footer{color:#71829b;text-align:center;padding:20px;font-size:12px}
 @media(max-width:600px){
- #chart{height:470px}
- .grid{grid-template-columns:1fr 1fr}
- header{padding:14px}
+#chart{height:470px}
+.grid{grid-template-columns:1fr 1fr}
+header{padding:14px}
 }
 </style>
 </head>
 <body>
 
 <header>
- <div>
-  <div class="logo">TradeVision</div>
-  <div class="version">PROFESSIONAL TRADING PLATFORM</div>
- </div>
- <div>2.0</div>
+<div>
+<div class="logo">TradeVision</div>
+<div class="version">PROFESSIONAL TRADING PLATFORM</div>
+</div>
+<div>2.0</div>
 </header>
 
 <main>
 
 <section class="panel">
- <h3>Рынок и график</h3>
+<h3>Рынок и график</h3>
+<div class="controls">
+<select id="symbol" onchange="updateChart()">
+<option value="BINANCE:BTCUSDT">BTC / USDT</option>
+<option value="BINANCE:ETHUSDT">ETH / USDT</option>
+<option value="BINANCE:BNBUSDT">BNB / USDT</option>
+<option value="BINANCE:SOLUSDT">SOL / USDT</option>
+<option value="OANDA:EURUSD">EUR / USD</option>
+<option value="OANDA:GBPUSD">GBP / USD</option>
+<option value="OANDA:XAUUSD">GOLD</option>
+<option value="NASDAQ:AAPL">APPLE</option>
+<option value="NASDAQ:NVDA">NVIDIA</option>
+<option value="NASDAQ:TSLA">TESLA</option>
+<option value="AMEX:SPY">S&P 500 ETF</option>
+</select>
 
- <div class="controls">
-  <select id="symbol" onchange="updateChart()">
-   <option value="BINANCE:BTCUSDT">BTC / USDT</option>
-   <option value="BINANCE:ETHUSDT">ETH / USDT</option>
-   <option value="BINANCE:BNBUSDT">BNB / USDT</option>
-   <option value="BINANCE:SOLUSDT">SOL / USDT</option>
-   <option value="OANDA:EURUSD">EUR / USD</option>
-   <option value="OANDA:GBPUSD">GBP / USD</option>
-   <option value="OANDA:XAUUSD">GOLD</option>
-   <option value="NASDAQ:AAPL">APPLE</option>
-   <option value="NASDAQ:NVDA">NVIDIA</option>
-   <option value="NASDAQ:TSLA">TESLA</option>
-   <option value="AMEX:SPY">S&P 500 ETF</option>
-  </select>
-
-  <select id="interval" onchange="updateChart()">
-   <option value="1">1 мин</option>
-   <option value="5">5 мин</option>
-   <option value="15" selected>15 мин</option>
-   <option value="30">30 мин</option>
-   <option value="60">1 час</option>
-   <option value="240">4 часа</option>
-   <option value="D">1 день</option>
-   <option value="W">1 неделя</option>
-  </select>
- </div>
-
- <div id="chart"></div>
+<select id="interval" onchange="updateChart()">
+<option value="1">1 мин</option>
+<option value="5">5 мин</option>
+<option value="15" selected>15 мин</option>
+<option value="30">30 мин</option>
+<option value="60">1 час</option>
+<option value="240">4 часа</option>
+<option value="D">1 день</option>
+<option value="W">1 неделя</option>
+</select>
+</div>
+<div id="chart"></div>
 </section>
 
 <section class="panel">
- <h3>Технические индикаторы</h3>
- <div class="grid">
-  <div class="metric">
-   <small>EMA</small>
-   <strong>20 / 50 / 200</strong>
-  </div>
-  <div class="metric">
-   <small>RSI</small>
-   <strong>RSI 14</strong>
-  </div>
-  <div class="metric">
-   <small>MACD</small>
-   <strong>12 / 26 / 9</strong>
-  </div>
-  <div class="metric">
-   <small>Bollinger Bands</small>
-   <strong>20 / 2</strong>
-  </div>
-  <div class="metric">
-   <small>Volume</small>
-   <strong>Объём</strong>
-  </div>
-  <div class="metric">
-   <small>Fibonacci</small>
-   <strong>Уровни</strong>
-  </div>
- </div>
+<h3>Технические индикаторы</h3>
+<div class="grid">
+<div class="metric">
+<small>EMA</small>
+<strong>20 / 50 / 200</strong>
+</div>
+<div class="metric">
+<small>RSI</small>
+<strong>RSI 14</strong>
+</div>
+<div class="metric">
+<small>MACD</small>
+<strong>12 / 26 / 9</strong>
+</div>
+<div class="metric">
+<small>Bollinger Bands</small>
+<strong>20 / 2</strong>
+</div>
+<div class="metric">
+<small>Volume</small>
+<strong>Объём торгов</strong>
+</div>
+<div class="metric">
+<small>Fibonacci</small>
+<strong>Уровни</strong>
+</div>
+</div>
 </section>
 
 <section class="panel">
- <h3>AI Market Analysis</h3>
- <div class="metric">
-  <small>Статус анализа</small>
-  <strong class="neutral">Ожидание подключения AI</strong>
-  <p style="color:#91a3bd;font-size:13px">
-   Модуль автоматического анализа, распознавания
-   паттернов и торговых сигналов будет подключён
-   на следующем этапе.
-  </p>
- </div>
+<h3>AI Market Analysis</h3>
+<div class="metric">
+<small>Статус анализа</small>
+<strong class="neutral">Ожидание подключения AI</strong>
+<p style="color:#91a3bd;font-size:13px">
+Автоматический анализ рынка будет подключён
+на следующем этапе разработки.
+</p>
+</div>
 </section>
 
 <section class="panel">
- <h3>Торговые сигналы</h3>
- <div class="grid">
-  <div class="metric">
-   <small>BUY</small>
-   <strong class="buy">Ожидание</strong>
-  </div>
-  <div class="metric">
-   <small>SELL</small>
-   <strong class="sell">Ожидание</strong>
-  </div>
- </div>
- <p style="color:#91a3bd;font-size:12px">
-  Сигналы пока не рассчитываются. Не использовать
-  этот блок для принятия торговых решений.
- </p>
+<h3>Торговые сигналы</h3>
+<div class="grid">
+<div class="metric">
+<small>BUY</small>
+<strong class="buy">Ожидание</strong>
+</div>
+<div class="metric">
+<small>SELL</small>
+<strong class="sell">Ожидание</strong>
+</div>
+</div>
+<p style="color:#91a3bd;font-size:12px">
+Сигналы пока не рассчитываются.
+</p>
 </section>
 
 </main>
@@ -178,48 +143,50 @@ TradeVision 2.0 | Professional Trading Interface
 
 <script>
 function updateChart(){
- const symbol=document.getElementById("symbol").value;
- const interval=document.getElementById("interval").value;
- const chart=document.getElementById("chart");
+const symbol=document.getElementById("symbol").value;
+const interval=document.getElementById("interval").value;
+const chart=document.getElementById("chart");
 
- chart.innerHTML="";
+chart.innerHTML="";
 
- const container=document.createElement("div");
- container.style.height="100%";
- container.style.width="100%";
- chart.appendChild(container);
+const container=document.createElement("div");
+container.style.height="100%";
+container.style.width="100%";
+chart.appendChild(container);
 
- const script=document.createElement("script");
- script.src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js";
- script.async=true;
+const script=document.createElement("script");
+script.src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js";
+script.async=true;
 
- script.innerHTML=JSON.stringify({
-  autosize:true,
-  symbol:symbol,
-  interval:interval,
-  timezone:"Etc/UTC",
-  theme:"dark",
-  style:"1",
-  locale:"ru",
-  backgroundColor:"#111b2b",
-  gridColor:"#263348",
-  allow_symbol_change:true,
-  save_image:false,
-  calendar:false,
-  hide_side_toolbar:false,
-  details:true,
-  hotlist:false,
-  withdateranges:true,
-  studies:[
-   "STD;EMA",
-   "STD;RSI",
-   "STD;MACD",
-   "STD;Bollinger_Bands"
-  ],
-  support_host:"https://www.tradingview.com"
- });
+script.innerHTML=JSON.stringify({
+autosize:true,
+symbol:symbol,
+interval:interval,
+timezone:"Etc/UTC",
+theme:"dark",
+style:"1",
+locale:"ru",
+backgroundColor:"#111b2b",
+gridColor:"#263348",
+allow_symbol_change:true,
+save_image:false,
+calendar:false,
+hide_side_toolbar:false,
+details:true,
+hotlist:false,
+withdateranges:true,
 
- container.appendChild(script);
+studies:[
+"STD;EMA",
+"STD;RSI",
+"STD;MACD",
+"STD;Bollinger_Bands"
+],
+
+support_host:"https://www.tradingview.com"
+});
+
+container.appendChild(script);
 }
 
 updateChart();
