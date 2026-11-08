@@ -9,457 +9,306 @@
 <style>
 *{box-sizing:border-box}
 body{margin:0;background:#080d16;color:#e8edf5;font-family:Arial}
-header{background:#101827;padding:17px;border-bottom:1px solid #263348;display:flex;justify-content:space-between;align-items:center}
+header{padding:16px;background:#101827;border-bottom:1px solid #263348;display:flex;justify-content:space-between}
 .logo{font-size:23px;font-weight:bold;color:#36b8ff}
-.version{font-size:11px;color:#8192aa}
+.version,.status{font-size:12px;color:#91a3bd}
 main{padding:12px;max-width:1500px;margin:auto}
-.panel{background:#111b2b;border:1px solid #263348;border-radius:10px;padding:13px;margin-bottom:13px}
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:13px;margin-bottom:13px}
 h3{font-size:16px;margin:0 0 12px}
 .controls{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
-select{background:#1b2940;color:white;border:1px solid #344763;padding:11px;border-radius:6px;flex:1;min-width:100px}
+select,button{background:var(--control);color:var(--text);border:1px solid var(--border);padding:11px;border-radius:6px}
+select{flex:1;min-width:100px}
+button{cursor:pointer}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.metric{background:var(--control);padding:12px;border-radius:8px}
+.metric small{color:var(--muted);font-size:12px}
+.metric strong{display:block;margin-top:8px;font-size:15px}
+.green{color:#00b987}.red{color:#ed526b}.yellow{color:#d99b20}
 #chart{height:510px;width:100%;position:relative}
 #ictOverlay{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:5}
-.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.metric{background:#1a2940;padding:12px;border-radius:8px;min-width:0}
-.metric small{color:#8ea2bd;font-size:12px}
-.metric strong{display:block;margin-top:8px;font-size:16px;overflow-wrap:anywhere}
-.green{color:#00d69b}
-.red{color:#ff536b}
-.yellow{color:#ffc857}
-.status{font-size:12px;color:#91a3bd;margin-top:10px}
-footer{text-align:center;color:#71829b;padding:20px;font-size:12px}
+.legend{display:flex;flex-wrap:wrap;gap:12px;font-size:11px;margin-top:10px;color:var(--muted)}
+.dot{width:9px;height:9px;display:inline-block;border-radius:2px}
+footer{text-align:center;padding:20px;color:var(--muted);font-size:12px}
+body.light{
+ --bg:#f3f6fb;--panel:#fff;--border:#d5deea;
+ --text:#243247;--muted:#64748b;--control:#edf2f8;
+ background:var(--bg);color:var(--text)
+}
+body.dark{
+ --bg:#080d16;--panel:#111b2b;--border:#263348;
+ --text:#e8edf5;--muted:#91a3bd;--control:#1a2940;
+ background:var(--bg);color:var(--text)
+}
 @media(max-width:600px){
-#chart{height:430px}
-.grid{grid-template-columns:1fr 1fr}
-header{padding:13px}
+ #chart{height:430px}
+ .grid{grid-template-columns:1fr 1fr}
 }
 </style>
 </head>
-<body>
+<body class="dark">
 
 <header>
-<div>
-<div class="logo">TradeVision</div>
-<div class="version">PROFESSIONAL TRADING PLATFORM</div>
-</div>
-<div>2.0</div>
+ <div>
+  <div class="logo">TradeVision</div>
+  <div class="version">PROFESSIONAL ICT PLATFORM</div>
+ </div>
+ <div>2.0</div>
 </header>
 
 <main>
-
 <section class="panel">
-<h3>Рынок и график</h3>
-
-<div class="controls">
-<select id="symbol">
-<option value="BTCUSDT">BTC / USDT</option>
-<option value="ETHUSDT">ETH / USDT</option>
-<option value="BNBUSDT">BNB / USDT</option>
-<option value="SOLUSDT">SOL / USDT</option>
-<option value="XRPUSDT">XRP / USDT</option>
-</select>
-
-<select id="interval">
-<option value="1m">1 мин</option>
-<option value="5m" selected>5 мин</option>
-<option value="15m">15 мин</option>
-<option value="30m">30 мин</option>
-<option value="1h">1 час</option>
-<option value="4h">4 часа</option>
-<option value="1d">1 день</option>
-</select>
-</div>
-
-<div id="chart">
-<canvas id="ictOverlay"></canvas>
-</div>
-<div id="connection" class="status">Подключение к Binance...</div>
+ <h3>Рынок и график</h3>
+ <div class="controls">
+  <select id="symbol">
+   <option value="BTCUSDT">BTC / USDT</option>
+   <option value="ETHUSDT">ETH / USDT</option>
+   <option value="BNBUSDT">BNB / USDT</option>
+   <option value="SOLUSDT">SOL / USDT</option>
+   <option value="XRPUSDT">XRP / USDT</option>
+  </select>
+  <select id="interval">
+   <option value="1m">1 мин</option>
+   <option value="5m" selected>5 мин</option>
+   <option value="15m">15 мин</option>
+   <option value="30m">30 мин</option>
+   <option value="1h">1 час</option>
+   <option value="4h">4 часа</option>
+   <option value="1d">1 день</option>
+  </select>
+  <button id="themeButton">☀ Светлая тема</button>
+ </div>
+ <div id="chart"><canvas id="ictOverlay"></canvas></div>
+ <div class="legend">
+  <span><i class="dot" style="background:#00d69b"></i> Bullish FVG / OB</span>
+  <span><i class="dot" style="background:#ff536b"></i> Bearish FVG / OB</span>
+  <span>BOS / CHoCH / SWEEP / MSS</span>
+ </div>
+ <div id="connection" class="status">Подключение...</div>
 </section>
 
 <section class="panel">
-<h3>Технические индикаторы</h3>
-<div class="grid">
-<div class="metric"><small>EMA 20</small><strong id="ema20">—</strong></div>
-<div class="metric"><small>EMA 50</small><strong id="ema50">—</strong></div>
-<div class="metric"><small>EMA 200</small><strong id="ema200">—</strong></div>
-<div class="metric"><small>RSI 14</small><strong id="rsi">—</strong></div>
-<div class="metric"><small>MACD</small><strong id="macd">—</strong></div>
-<div class="metric"><small>Bollinger Bands</small><strong id="bb">—</strong></div>
-</div>
+ <h3>ICT Market Structure</h3>
+ <div class="grid">
+  <div class="metric"><small>Liquidity Sweep</small><strong id="sweep">—</strong></div>
+  <div class="metric"><small>Fair Value Gap</small><strong id="fvg">—</strong></div>
+  <div class="metric"><small>Order Blocks</small><strong id="ob">—</strong></div>
+  <div class="metric"><small>BOS</small><strong id="bos">—</strong></div>
+  <div class="metric"><small>CHoCH</small><strong id="choch">—</strong></div>
+  <div class="metric"><small>MSS</small><strong id="mss">—</strong></div>
+ </div>
 </section>
 
 <section class="panel">
-<h3>ICT Market Structure</h3>
-<div class="grid">
-<div class="metric"><small>Liquidity Sweep</small><strong id="sweep">Ожидание</strong></div>
-<div class="metric"><small>Fair Value Gap</small><strong id="fvg">Поиск</strong></div>
-<div class="metric"><small>Market Structure Shift</small><strong id="mss">Ожидание</strong></div>
-</div>
+ <h3>BUY / SELL Signals</h3>
+ <div class="grid">
+  <div class="metric"><small>Направление</small><strong id="signal" class="yellow">НЕТ СИГНАЛА</strong></div>
+  <div class="metric"><small>Stop Loss</small><strong id="sl">—</strong></div>
+  <div class="metric"><small>Take Profit</small><strong id="tp">—</strong></div>
+ </div>
+ <div id="analysis" class="status">Ожидание данных</div>
 </section>
-
-<section class="panel">
-<h3>BUY / SELL Signals</h3>
-<div class="grid">
-<div class="metric"><small>Направление</small><strong id="signal" class="yellow">НЕТ СИГНАЛА</strong></div>
-<div class="metric"><small>Stop Loss</small><strong id="sl">—</strong></div>
-<div class="metric"><small>Take Profit</small><strong id="tp">—</strong></div>
-</div>
-<div class="status" id="analysis">Ожидание рыночных данных</div>
-</section>
-
 <footer>TradeVision 2.0 | ICT Engine</footer>
 </main>
 
 <script>
-const chartElement=document.getElementById("chart");
-const chart=LightweightCharts.createChart(chartElement,{
-  width:chartElement.clientWidth,
-  height:510,
-  layout:{
-    background:{color:"#111b2b"},
-    textColor:"#a9bad0"
-  },
-  grid:{
-    vertLines:{color:"#263348"},
-    horzLines:{color:"#263348"}
-  },
-  rightPriceScale:{borderColor:"#344763"},
-  timeScale:{
-    borderColor:"#344763",
-    timeVisible:true,
-    secondsVisible:false
-  },
-  crosshair:{mode:1}
+const $=id=>document.getElementById(id);
+let raw=[],zones=[],requestId=0;
+
+const chart=LightweightCharts.createChart($("chart"),{
+ width:$("chart").clientWidth,height:$("chart").clientHeight,
+ layout:{background:{color:"#111b2b"},textColor:"#a9bad0"},
+ grid:{vertLines:{color:"#263348"},horzLines:{color:"#263348"}},
+ rightPriceScale:{borderColor:"#344763"},
+ timeScale:{borderColor:"#344763",timeVisible:true},
+ crosshair:{mode:1}
 });
 
 const candles=chart.addCandlestickSeries({
-  upColor:"#00c896",
-  downColor:"#ff536b",
-  borderUpColor:"#00c896",
-  borderDownColor:"#ff536b",
-  wickUpColor:"#00c896",
-  wickDownColor:"#ff536b"
+ upColor:"#00c896",downColor:"#ff536b",
+ borderUpColor:"#00c896",borderDownColor:"#ff536b",
+ wickUpColor:"#00c896",wickDownColor:"#ff536b"
 });
 
-const ema20=chart.addLineSeries({color:"#36b8ff",lineWidth:2});
-const ema50=chart.addLineSeries({color:"#ffc857",lineWidth:2});
-const ema200=chart.addLineSeries({color:"#c084fc",lineWidth:2});
-
-const bbUpper=chart.addLineSeries({
- color:"rgba(54,184,255,0.5)",lineWidth:1
-});
-const bbLower=chart.addLineSeries({
- color:"rgba(54,184,255,0.5)",lineWidth:1
-});
-
-let raw=[];
-let zones=[];
-let signalLevels=[];
-let resizeObserver;
-
-function average(values){
- return values.reduce((a,b)=>a+b,0)/values.length;
-}
-
-function calculateEMA(data,period){
- let result=[];
- const k=2/(period+1);
- let prev=data[0].close;
- data.forEach((c,i)=>{
-  prev=i===0?c.close:c.close*k+prev*(1-k);
-  result.push({time:c.time,value:prev});
+function setTheme(light){
+ document.body.className=light?"light":"dark";
+ chart.applyOptions({
+  layout:{
+   background:{color:light?"#ffffff":"#111b2b"},
+   textColor:light?"#334155":"#a9bad0"
+  },
+  grid:{
+   vertLines:{color:light?"#e5eaf1":"#263348"},
+   horzLines:{color:light?"#e5eaf1":"#263348"}
+  },
+  rightPriceScale:{borderColor:light?"#cbd5e1":"#344763"},
+  timeScale:{borderColor:light?"#cbd5e1":"#344763"}
  });
- return result;
+ $("themeButton").textContent=light?"☾ Тёмная тема":"☀ Светлая тема";
+ drawZones();
 }
+let light=false;
+$("themeButton").onclick=()=>{light=!light;setTheme(light)};
 
-function calculateRSI(data){
- if(data.length<15)return null;
- let gains=0,losses=0;
- for(let i=data.length-14;i<data.length;i++){
-  let d=data[i].close-data[i-1].close;
-  if(d>0)gains+=d;
-  else losses-=d;
- }
- if(losses===0)return 100;
- return 100-100/(1+(gains/14)/(losses/14));
-}
+function detectICT(d){
+ let z=[],m=[],sweep=null,fvg=null,trend=0;
+ let lastHigh=null,lastLow=null,signal=null;
+ let state={sweep:"Не найден",fvg:"Не найден",ob:"Не найден",bos:"—",choch:"—",mss:"—"};
 
-function calculateMACD(data){
- const fast=calculateEMA(data,12);
- const slow=calculateEMA(data,26);
- const dif=fast.map((v,i)=>v.value-slow[i].value);
- return dif[dif.length-1];
-}
-
-function calculateBB(data){
- const closes=data.slice(-20).map(x=>x.close);
- const mean=average(closes);
- const variance=average(closes.map(x=>(x-mean)**2));
- const deviation=Math.sqrt(variance);
- return {upper:mean+2*deviation,lower:mean-2*deviation};
-}
-
-function detectICT(data){
- let lastHigh=null,lastLow=null;
- let sweepEvent=null,fvgEvent=null;
- let markers=[];
- let foundZones=[];
- let foundSignal=null;
-
- for(let i=5;i<data.length;i++){
-  const p=i-2;
-  const pivot=data[p];
-
-  let isHigh=true,isLow=true;
-
+ for(let i=5;i<d.length;i++){
+  let p=i-2,h=true,l=true;
   for(let j=p-2;j<=p+2;j++){
    if(j===p)continue;
-   if(data[j].high>=pivot.high)isHigh=false;
-   if(data[j].low<=pivot.low)isLow=false;
+   if(d[j].high>=d[p].high)h=false;
+   if(d[j].low<=d[p].low)l=false;
+  }
+  if(h)lastHigh={price:d[p].high,index:p};
+  if(l)lastLow={price:d[p].low,index:p};
+
+  let c=d[i],prev=d[i-1];
+
+  if(lastHigh&&c.high>lastHigh.price&&c.close<lastHigh.price){
+   sweep={dir:"bearish",index:i,extreme:c.high,structure:lastLow?.price};
+   state.sweep="BEARISH";
+   m.push({time:c.time,position:"aboveBar",color:"#ff536b",shape:"arrowDown",text:"SWEEP"});
+  }
+  if(lastLow&&c.low<lastLow.price&&c.close>lastLow.price){
+   sweep={dir:"bullish",index:i,extreme:c.low,structure:lastHigh?.price};
+   state.sweep="BULLISH";
+   m.push({time:c.time,position:"belowBar",color:"#00d69b",shape:"arrowUp",text:"SWEEP"});
   }
 
-  if(isHigh)lastHigh=pivot.high;
-  if(isLow)lastLow=pivot.low;
-
-  const c=data[i];
-
-  if(lastHigh!==null && c.high>lastHigh && c.close<lastHigh){
-   sweepEvent={
-    dir:"bearish",index:i,
-    level:lastHigh,
-    structure:lastLow
-   };
-   markers.push({
-    time:c.time,position:"aboveBar",
-    color:"#ff536b",shape:"arrowDown",
-    text:"Liquidity Sweep"
-   });
+  let newFVG=null;
+  if(c.low>d[i-2].high){
+   newFVG={dir:"bullish",type:"FVG",start:d[i-2].time,top:c.low,bottom:d[i-2].high,index:i};
+  }
+  if(c.high<d[i-2].low){
+   newFVG={dir:"bearish",type:"FVG",start:d[i-2].time,top:d[i-2].low,bottom:c.high,index:i};
+  }
+  if(newFVG){
+   z.push(newFVG);fvg=newFVG;
+   state.fvg=newFVG.dir.toUpperCase();
+   m.push({time:c.time,position:newFVG.dir==="bullish"?"belowBar":"aboveBar",color:newFVG.dir==="bullish"?"#00d69b":"#ff536b",shape:"circle",text:"FVG"});
   }
 
-  if(lastLow!==null && c.low<lastLow && c.close>lastLow){
-   sweepEvent={
-    dir:"bullish",index:i,
-    level:lastLow,
-    structure:lastHigh
-   };
-   markers.push({
-    time:c.time,position:"belowBar",
-    color:"#00d69b",shape:"arrowUp",
-    text:"Liquidity Sweep"
-   });
+  let br=null;
+  if(lastHigh&&prev.close<=lastHigh.price&&c.close>lastHigh.price){
+   br={dir:"bullish",level:lastHigh.price};
+  }
+  if(lastLow&&prev.close>=lastLow.price&&c.close<lastLow.price){
+   br={dir:"bearish",level:lastLow.price};
   }
 
-  if(c.low>data[i-2].high){
-   fvgEvent={
-    dir:"bullish",index:i,
-    top:c.low,bottom:data[i-2].high,
-    start:data[i-2].time
-   };
-   foundZones.push(fvgEvent);
-  }
+  if(br){
+   let bullish=br.dir==="bullish";
+   let type=trend===0||trend===(bullish?1:-1)?"BOS":"CHoCH";
+   trend=bullish?1:-1;
+   state[type.toLowerCase()]=br.dir.toUpperCase();
 
-  if(c.high<data[i-2].low){
-   fvgEvent={
-    dir:"bearish",index:i,
-    top:data[i-2].low,bottom:c.high,
-    start:data[i-2].time
-   };
-   foundZones.push(fvgEvent);
-  }
+   m.push({time:c.time,position:bullish?"belowBar":"aboveBar",color:"#36b8ff",shape:"square",text:type});
 
-  if(sweepEvent && fvgEvent &&
-     sweepEvent.dir===fvgEvent.dir &&
-     fvgEvent.index>sweepEvent.index &&
-     i>sweepEvent.index &&
-     i-sweepEvent.index<=30 &&
-     sweepEvent.structure!==null){
+   for(let j=i-1;j>=Math.max(0,i-10);j--){
+    let x=d[j],opposite=bullish?x.close<x.open:x.close>x.open;
+    if(opposite){
+     z.push({dir:br.dir,type:"OB",start:x.time,top:x.high,bottom:x.low,index:j});
+     state.ob=br.dir.toUpperCase()+" OB";
+     break;
+    }
+   }
 
-   const bullish=sweepEvent.dir==="bullish";
-   const broken=bullish
-    ? c.close>sweepEvent.structure
-    : c.close<sweepEvent.structure;
-
-   if(broken){
-    foundSignal={
-     dir:sweepEvent.dir,
-     index:i,
-     entry:c.close,
-     sl:bullish?Math.min(...data.slice(sweepEvent.index,i+1).map(x=>x.low)):
-        Math.max(...data.slice(sweepEvent.index,i+1).map(x=>x.high))
-    };
-
-    markers.push({
-     time:c.time,
-     position:bullish?"belowBar":"aboveBar",
-     color:bullish?"#00d69b":"#ff536b",
-     shape:bullish?"arrowUp":"arrowDown",
-     text:bullish?"BUY":"SELL"
-    });
-
-    sweepEvent=null;
-    fvgEvent=null;
+   if(sweep&&fvg&&sweep.dir===br.dir&&fvg.dir===br.dir&&
+      sweep.index<i&&fvg.index>sweep.index&&
+      i-sweep.index<=30&&sweep.structure!==undefined){
+    let sl=sweep.extreme,risk=Math.abs(c.close-sl);
+    state.mss=br.dir.toUpperCase();
+    if(risk>0){
+     signal={dir:br.dir,entry:c.close,sl,tp:bullish?c.close+2*risk:c.close-2*risk};
+     m.push({time:c.time,position:bullish?"belowBar":"aboveBar",color:bullish?"#00d69b":"#ff536b",shape:bullish?"arrowUp":"arrowDown",text:bullish?"BUY":"SELL"});
+    }
+    sweep=null;fvg=null;
    }
   }
+  if(sweep&&i-sweep.index>30)sweep=null;
+  if(fvg&&i-fvg.index>30)fvg=null;
  }
-
- return {
-  markers:markers,
-  zones:foundZones.slice(-12),
-  signal:foundSignal,
-  sweep:sweepEvent,
-  fvg:fvgEvent
- };
+ return {zones:z.slice(-30),markers:m.slice(-100),signal,state};
 }
 
 function drawZones(){
- const canvas=document.getElementById("ictOverlay");
- const rect=chartElement.getBoundingClientRect();
- const dpr=window.devicePixelRatio||1;
-
- canvas.width=rect.width*dpr;
- canvas.height=rect.height*dpr;
- canvas.style.width=rect.width+"px";
- canvas.style.height=rect.height+"px";
-
- const ctx=canvas.getContext("2d");
+ let canvas=$("ictOverlay"),rect=$("chart").getBoundingClientRect();
+ let dpr=devicePixelRatio||1;
+ canvas.width=rect.width*dpr;canvas.height=rect.height*dpr;
+ canvas.style.width=rect.width+"px";canvas.style.height=rect.height+"px";
+ let ctx=canvas.getContext("2d");
  ctx.setTransform(dpr,0,0,dpr,0,0);
  ctx.clearRect(0,0,rect.width,rect.height);
-
+ if(!raw.length)return;
  zones.forEach(z=>{
-  const x1=chart.timeScale().timeToCoordinate(z.start);
-  const x2=chart.timeScale().timeToCoordinate(raw[raw.length-1].time);
-  const y1=candles.priceToCoordinate(z.top);
-  const y2=candles.priceToCoordinate(z.bottom);
-
+  let x1=chart.timeScale().timeToCoordinate(z.start);
+  let x2=chart.timeScale().timeToCoordinate(raw[raw.length-1].time);
+  let y1=candles.priceToCoordinate(z.top),y2=candles.priceToCoordinate(z.bottom);
   if(x1===null||x2===null||y1===null||y2===null)return;
-
-  ctx.fillStyle=z.dir==="bullish"
-   ?"rgba(0,214,155,0.15)"
-   :"rgba(255,83,107,0.15)";
-
-  ctx.strokeStyle=z.dir==="bullish"
-   ?"rgba(0,214,155,0.65)"
-   :"rgba(255,83,107,0.65)";
-
-  ctx.fillRect(x1,y1,x2-x1,y2-y1);
-  ctx.strokeRect(x1,y1,x2-x1,y2-y1);
-
-  ctx.fillStyle=z.dir==="bullish"?"#00d69b":"#ff536b";
-  ctx.font="11px Arial";
-  ctx.fillText(z.dir==="bullish"?"Bullish FVG":"Bearish FVG",x1+4,y1+12);
+  let bull=z.dir==="bullish",color=bull?"#00b987":"#ed526b";
+  ctx.fillStyle=bull?"rgba(0,190,135,.15)":"rgba(237,82,107,.15)";
+  ctx.strokeStyle=color;
+  let left=Math.max(0,x1),right=Math.min(rect.width,x2);
+  if(right<=left)return;
+  let top=Math.min(y1,y2),height=Math.abs(y2-y1);
+  ctx.fillRect(left,top,right-left,height);
+  ctx.strokeRect(left,top,right-left,height);
+  ctx.fillStyle=color;ctx.font="bold 11px Arial";
+  ctx.fillText(z.type==="OB"?"ORDER BLOCK":bull?"BULLISH FVG":"BEARISH FVG",left+4,Math.max(12,top+12));
  });
-}
-
-function updateIndicators(){
- const e20=calculateEMA(raw,20);
- const e50=calculateEMA(raw,50);
- const e200=calculateEMA(raw,200);
-
- ema20.setData(e20);
- ema50.setData(e50);
- ema200.setData(e200);
-
- const bb=calculateBB(raw);
- const mean=average(raw.slice(-20).map(x=>x.close));
- const closes=raw.slice(-20).map(x=>x.close);
- const sd=Math.sqrt(average(closes.map(x=>(x-mean)**2)));
-
- bbUpper.setData(raw.slice(-20).map(x=>({time:x.time,value:mean+2*sd})));
- bbLower.setData(raw.slice(-20).map(x=>({time:x.time,value:mean-2*sd})));
-
- document.getElementById("ema20").textContent=e20.at(-1).value.toFixed(2);
- document.getElementById("ema50").textContent=e50.at(-1).value.toFixed(2);
- document.getElementById("ema200").textContent=e200.at(-1).value.toFixed(2);
- document.getElementById("rsi").textContent=calculateRSI(raw)?.toFixed(2)??"—";
- document.getElementById("macd").textContent=calculateMACD(raw).toFixed(4);
- document.getElementById("bb").textContent=bb.lower.toFixed(2)+" – "+bb.upper.toFixed(2);
 }
 
 function updateICT(){
- const result=detectICT(raw);
- zones=result.zones;
- candles.setMarkers(result.markers);
- drawZones();
-
- document.getElementById("sweep").textContent=
-  result.sweep?result.sweep.dir.toUpperCase():"Не найден";
-
- document.getElementById("fvg").textContent=
-  result.fvg?result.fvg.dir.toUpperCase():"Поиск зон";
-
- document.getElementById("mss").textContent=
-  result.signal?"ПОДТВЕРЖДЁН":"Ожидание";
-
- const signal=document.getElementById("signal");
-
- if(result.signal){
-  const s=result.signal;
-  const risk=Math.abs(s.entry-s.sl);
-  const tp=s.dir==="bullish"?s.entry+2*risk:s.entry-2*risk;
-
-  signal.textContent=s.dir==="bullish"?"BUY":"SELL";
-  signal.className=s.dir==="bullish"?"green":"red";
-  document.getElementById("sl").textContent=s.sl.toFixed(2);
-  document.getElementById("tp").textContent=tp.toFixed(2);
-  document.getElementById("analysis").textContent=
-   "ICT: Sweep + FVG + MSS. Последнее историческое подтверждение.";
+ let r=detectICT(raw);
+ zones=r.zones;candles.setMarkers(r.markers);
+ Object.keys(r.state).forEach(k=>$(k).textContent=r.state[k]);
+ let s=r.signal;
+ if(s){
+  $("signal").textContent=s.dir==="bullish"?"BUY":"SELL";
+  $("signal").className=s.dir==="bullish"?"green":"red";
+  $("sl").textContent=s.sl.toFixed(2);
+  $("tp").textContent=s.tp.toFixed(2);
+  $("analysis").textContent="ICT: Sweep + FVG + MSS. Историческое подтверждение.";
  }else{
-  signal.textContent="НЕТ СИГНАЛА";
-  signal.className="yellow";
-  document.getElementById("sl").textContent="—";
-  document.getElementById("tp").textContent="—";
-  document.getElementById("analysis").textContent=
-   "Нет полного подтверждения ICT.";
+  $("signal").textContent="НЕТ СИГНАЛА";
+  $("signal").className="yellow";
+  $("sl").textContent="—";$("tp").textContent="—";
+  $("analysis").textContent="Ожидание полного подтверждения ICT.";
  }
+ drawZones();
 }
 
 async function loadData(){
- const symbol=document.getElementById("symbol").value;
- const interval=document.getElementById("interval").value;
- const status=document.getElementById("connection");
-
- status.textContent="Загрузка котировок Binance...";
-
+ let id=++requestId;
+ let symbol=$("symbol").value,interval=$("interval").value;
+ $("connection").textContent="Загрузка Binance...";
  try{
-  const url=`https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=500`;
-  const response=await fetch(url);
-
-  if(!response.ok)throw new Error("Ошибка Binance: "+response.status);
-
-  const data=await response.json();
-
-  raw=data.map(k=>({
-   time:Math.floor(k[0]/1000),
-   open:+k[1],
-   high:+k[2],
-   low:+k[3],
-   close:+k[4]
-  }));
-
+  let response=await fetch("https://api.binance.com/api/v3/klines?symbol="+symbol+"&interval="+interval+"&limit=500");
+  if(!response.ok)throw Error("Binance HTTP "+response.status);
+  let data=await response.json();
+  if(id!==requestId)return;
+  raw=data.map(k=>({time:Math.floor(k[0]/1000),open:+k[1],high:+k[2],low:+k[3],close:+k[4]}));
   candles.setData(raw);
-  updateIndicators();
-  updateICT();
   chart.timeScale().fitContent();
-
-  status.textContent="Подключено: Binance | "+symbol+" | "+interval;
- }catch(error){
-  status.textContent="Ошибка загрузки: "+error.message;
+  updateICT();
+  $("connection").textContent="Подключено: Binance | "+symbol+" | "+interval;
+ }catch(e){
+  if(id===requestId)$("connection").textContent="Ошибка: "+e.message;
  }
 }
 
-document.getElementById("symbol").addEventListener("change",loadData);
-document.getElementById("interval").addEventListener("change",loadData);
-
+$("symbol").onchange=loadData;
+$("interval").onchange=loadData;
 chart.timeScale().subscribeVisibleTimeRangeChange(drawZones);
 
 if(window.ResizeObserver){
- resizeObserver=new ResizeObserver(()=>{
-  chart.applyOptions({width:chartElement.clientWidth});
+ new ResizeObserver(()=>{
+  chart.applyOptions({width:$("chart").clientWidth,height:$("chart").clientHeight});
   drawZones();
- });
- resizeObserver.observe(chartElement);
+ }).observe($("chart"));
 }
-
 loadData();
 </script>
 </body>
