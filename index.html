@@ -6,131 +6,307 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>TradeVision 2.0</title>
 <script src="https://unpkg.com/lightweight-charts@4.2.0/dist/lightweight-charts.standalone.production.js"></script>
+
 <style>
 *{box-sizing:border-box}
-body{margin:0;background:#080d16;color:#e8edf5;font-family:Arial}
-header{padding:16px;background:#101827;border-bottom:1px solid #263348;display:flex;justify-content:space-between}
-.logo{font-size:23px;font-weight:bold;color:#36b8ff}
-.version,.status{font-size:12px;color:#91a3bd}
-main{padding:12px;max-width:1500px;margin:auto}
-.panel{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:13px;margin-bottom:13px}
-h3{font-size:16px;margin:0 0 12px}
-.controls{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
-select,button{background:var(--control);color:var(--text);border:1px solid var(--border);padding:11px;border-radius:6px}
-select{flex:1;min-width:100px}
-button{cursor:pointer}
-.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.metric{background:var(--control);padding:12px;border-radius:8px}
-.metric small{color:var(--muted);font-size:12px}
-.metric strong{display:block;margin-top:8px;font-size:15px}
-.green{color:#00b987}.red{color:#ed526b}.yellow{color:#d99b20}
-#chart{height:510px;width:100%;position:relative}
-#ictOverlay{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:5}
-.legend{display:flex;flex-wrap:wrap;gap:12px;font-size:11px;margin-top:10px;color:var(--muted)}
-.dot{width:9px;height:9px;display:inline-block;border-radius:2px}
-footer{text-align:center;padding:20px;color:var(--muted);font-size:12px}
-body.light{
- --bg:#f3f6fb;--panel:#fff;--border:#d5deea;
- --text:#243247;--muted:#64748b;--control:#edf2f8;
- background:var(--bg);color:var(--text)
-}
-body.dark{
+:root{
  --bg:#080d16;--panel:#111b2b;--border:#263348;
  --text:#e8edf5;--muted:#91a3bd;--control:#1a2940;
- background:var(--bg);color:var(--text)
+ --accent:#36b8ff;--green:#00c896;--red:#ff536b;
 }
-@media(max-width:600px){
- #chart{height:430px}
- .grid{grid-template-columns:1fr 1fr}
+body.light{
+ --bg:#f1f4f8;--panel:#fff;--border:#d7e0eb;
+ --text:#263449;--muted:#64748b;--control:#edf2f8;
+}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,sans-serif}
+button,input,select{font:inherit}
+button,select,input{
+ background:var(--control);color:var(--text);
+ border:1px solid var(--border);border-radius:6px;padding:9px;
+}
+button{cursor:pointer}
+button:hover,.active{border-color:var(--accent);color:var(--accent)}
+header{
+ height:58px;background:var(--panel);border-bottom:1px solid var(--border);
+ display:flex;align-items:center;justify-content:space-between;
+ padding:0 15px;gap:12px
+}
+.logo{font-size:21px;font-weight:bold;color:var(--accent)}
+.version{font-size:10px;color:var(--muted);letter-spacing:1px;margin-top:3px}
+.header-right{display:flex;align-items:center;gap:8px}
+.status{font-size:11px;color:var(--muted)}
+.topbar{
+ display:flex;align-items:center;gap:8px;padding:9px 12px;
+ background:var(--panel);border-bottom:1px solid var(--border);
+ flex-wrap:wrap
+}
+.topbar input{width:145px}
+.topbar select{min-width:105px}
+.layout{
+ display:grid;grid-template-columns:48px minmax(0,1fr) 245px;
+ min-height:calc(100vh - 105px)
+}
+.leftbar{
+ background:var(--panel);border-right:1px solid var(--border);
+ display:flex;flex-direction:column;align-items:center;gap:8px;padding:10px 5px
+}
+.tool{
+ width:36px;height:36px;padding:4px;font-size:17px;
+ display:flex;align-items:center;justify-content:center
+}
+.workspace{min-width:0;padding:10px}
+.chart-panel{
+ background:var(--panel);border:1px solid var(--border);
+ border-radius:8px;overflow:hidden
+}
+.chart-heading{
+ display:flex;justify-content:space-between;align-items:center;
+ gap:8px;padding:10px 12px;border-bottom:1px solid var(--border);
+ flex-wrap:wrap
+}
+.chart-heading strong{font-size:14px}
+.chart-heading span{font-size:11px;color:var(--muted)}
+.chart-controls{
+ display:flex;gap:6px;align-items:center;flex-wrap:wrap;
+ padding:8px 10px;border-bottom:1px solid var(--border)
+}
+.chart-controls button{font-size:11px;padding:7px 9px}
+#chart{height:570px;width:100%;position:relative}
+#ictOverlay{
+ position:absolute;inset:0;width:100%;height:100%;
+ pointer-events:none;z-index:5
+}
+.legend{
+ display:flex;gap:13px;flex-wrap:wrap;padding:9px 12px;
+ font-size:10px;color:var(--muted);border-top:1px solid var(--border)
+}
+.dot{width:8px;height:8px;display:inline-block;border-radius:2px;margin-right:4px}
+.rightbar{
+ background:var(--panel);border-left:1px solid var(--border);
+ padding:10px;min-width:0
+}
+.section-title{
+ font-size:13px;font-weight:bold;margin:5px 0 10px;
+ display:flex;justify-content:space-between;align-items:center
+}
+.watch-search{width:100%;margin-bottom:8px}
+.watchlist{display:flex;flex-direction:column;gap:4px}
+.market{
+ width:100%;display:flex;justify-content:space-between;align-items:center;
+ padding:9px 7px;text-align:left;font-size:12px
+}
+.market small{color:var(--muted)}
+.market.selected{border-color:var(--accent);background:rgba(54,184,255,.08)}
+.divider{height:1px;background:var(--border);margin:13px 0}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.metric{
+ background:var(--control);border-radius:6px;padding:9px;min-width:0
+}
+.metric small{display:block;color:var(--muted);font-size:10px}
+.metric strong{display:block;margin-top:7px;font-size:12px;overflow-wrap:anywhere}
+.green{color:var(--green)}.red{color:var(--red)}.yellow{color:#e6ad39}
+.signal-box{margin-top:7px}
+.analysis{font-size:11px;color:var(--muted);line-height:1.5;margin-top:9px}
+.connection{
+ padding:8px 12px;font-size:10px;color:var(--muted);
+ border-top:1px solid var(--border)
+}
+.mobile-button{display:none}
+.hidden{display:none!important}
+footer{text-align:center;padding:14px;color:var(--muted);font-size:10px}
+@media(max-width:850px){
+ .layout{grid-template-columns:42px minmax(0,1fr)}
+ .rightbar{
+  display:none;position:fixed;z-index:20;right:0;top:0;bottom:0;
+  width:min(310px,88vw);overflow-y:auto;
+  box-shadow:0 0 30px #0008
+ }
+ .rightbar.open{display:block}
+ .mobile-button{display:inline-block}
+ #chart{height:480px}
+}
+@media(max-width:520px){
+ header{height:52px;padding:0 9px}
+ .logo{font-size:18px}
+ .version{font-size:9px}
+ .topbar{padding:7px;gap:5px}
+ .topbar input{width:110px;flex:1}
+ .topbar select{min-width:85px;flex:1}
+ .workspace{padding:5px}
+ .layout{grid-template-columns:38px minmax(0,1fr)}
+ .leftbar{padding:8px 2px}
+ .tool{width:32px;height:34px}
+ #chart{height:420px}
+ .chart-heading{padding:8px}
+ .chart-controls{gap:4px;padding:6px}
+ .chart-controls button{padding:6px;font-size:10px}
 }
 </style>
 </head>
-<body class="dark">
 
+<body>
 <header>
  <div>
   <div class="logo">TradeVision</div>
   <div class="version">PROFESSIONAL ICT PLATFORM</div>
  </div>
- <div>2.0</div>
+ <div class="header-right">
+  <span class="status">VERSION 2.0</span>
+  <button id="themeButton">☀ Светлая</button>
+ </div>
 </header>
 
-<main>
-<section class="panel">
- <h3>Рынок и график</h3>
- <div class="controls">
-  <select id="symbol">
-   <option value="BTCUSDT">BTC / USDT</option>
-   <option value="ETHUSDT">ETH / USDT</option>
-   <option value="BNBUSDT">BNB / USDT</option>
-   <option value="SOLUSDT">SOL / USDT</option>
-   <option value="XRPUSDT">XRP / USDT</option>
-  </select>
-  <select id="interval">
-   <option value="1m">1 мин</option>
-   <option value="5m" selected>5 мин</option>
-   <option value="15m">15 мин</option>
-   <option value="30m">30 мин</option>
-   <option value="1h">1 час</option>
-   <option value="4h">4 часа</option>
-   <option value="1d">1 день</option>
-  </select>
-  <button id="themeButton">☀ Светлая тема</button>
- </div>
- <div id="chart"><canvas id="ictOverlay"></canvas></div>
- <div class="legend">
-  <span><i class="dot" style="background:#00d69b"></i> Bullish FVG / OB</span>
-  <span><i class="dot" style="background:#ff536b"></i> Bearish FVG / OB</span>
-  <span>BOS / CHoCH / SWEEP / MSS</span>
- </div>
- <div id="connection" class="status">Подключение...</div>
-</section>
+<div class="topbar">
+ <input id="pairSearch" placeholder="Поиск рынка...">
+ <select id="symbol">
+  <option value="BTCUSDT">BTC / USDT</option>
+  <option value="ETHUSDT">ETH / USDT</option>
+  <option value="BNBUSDT">BNB / USDT</option>
+  <option value="SOLUSDT">SOL / USDT</option>
+  <option value="XRPUSDT">XRP / USDT</option>
+  <option value="ADAUSDT">ADA / USDT</option>
+  <option value="DOGEUSDT">DOGE / USDT</option>
+  <option value="LTCUSDT">LTC / USDT</option>
+  <option value="LINKUSDT">LINK / USDT</option>
+  <option value="AVAXUSDT">AVAX / USDT</option>
+  <option value="TRXUSDT">TRX / USDT</option>
+  <option value="DOTUSDT">DOT / USDT</option>
+  <option value="BCHUSDT">BCH / USDT</option>
+  <option value="TONUSDT">TON / USDT</option>
+  <option value="ETCUSDT">ETC / USDT</option>
+  <option value="NEARUSDT">NEAR / USDT</option>
+  <option value="APTUSDT">APT / USDT</option>
+  <option value="SUIUSDT">SUI / USDT</option>
+ </select>
+ <select id="interval">
+  <option value="1m">1 мин</option>
+  <option value="5m" selected>5 мин</option>
+  <option value="15m">15 мин</option>
+  <option value="30m">30 мин</option>
+  <option value="1h">1 час</option>
+  <option value="4h">4 часа</option>
+  <option value="1d">1 день</option>
+ </select>
+ <button id="watchButton" class="mobile-button">☷ Рынки / ICT</button>
+</div>
 
-<section class="panel">
- <h3>ICT Market Structure</h3>
- <div class="grid">
-  <div class="metric"><small>Liquidity Sweep</small><strong id="sweep">—</strong></div>
-  <div class="metric"><small>Fair Value Gap</small><strong id="fvg">—</strong></div>
-  <div class="metric"><small>Order Blocks</small><strong id="ob">—</strong></div>
-  <div class="metric"><small>BOS</small><strong id="bos">—</strong></div>
-  <div class="metric"><small>CHoCH</small><strong id="choch">—</strong></div>
-  <div class="metric"><small>MSS</small><strong id="mss">—</strong></div>
- </div>
-</section>
+<div class="layout">
 
-<section class="panel">
- <h3>BUY / SELL Signals</h3>
- <div class="grid">
-  <div class="metric"><small>Направление</small><strong id="signal" class="yellow">НЕТ СИГНАЛА</strong></div>
-  <div class="metric"><small>Stop Loss</small><strong id="sl">—</strong></div>
-  <div class="metric"><small>Take Profit</small><strong id="tp">—</strong></div>
- </div>
- <div id="analysis" class="status">Ожидание данных</div>
-</section>
-<footer>TradeVision 2.0 | ICT Engine</footer>
-</main>
+ <aside class="leftbar">
+  <button class="tool active" id="toolCursor" title="Курсор">↖</button>
+  <button class="tool" id="toolFVG" title="Показать или скрыть FVG">F</button>
+  <button class="tool" id="toolOB" title="Показать или скрыть Order Blocks">OB</button>
+  <button class="tool" id="toolMarkers" title="Показать или скрыть метки">M</button>
+  <button class="tool" id="toolSweep" title="Показать или скрыть Sweep">S</button>
+ </aside>
+
+ <main class="workspace">
+  <section class="chart-panel">
+   <div class="chart-heading">
+    <strong id="chartTitle">BTC / USDT</strong>
+    <span id="priceLabel">Ожидание котировок</span>
+   </div>
+
+   <div class="chart-controls">
+    <button class="active" id="modeICT">ICT</button>
+    <button id="modeClean">Чистый график</button>
+    <button id="modeFull">Все зоны</button>
+    <button id="fitButton">Вписать график</button>
+   </div>
+
+   <div id="chart">
+    <canvas id="ictOverlay"></canvas>
+   </div>
+
+   <div class="legend">
+    <span><i class="dot" style="background:#00c896"></i>Bullish FVG / OB</span>
+    <span><i class="dot" style="background:#ff536b"></i>Bearish FVG / OB</span>
+    <span>BOS / CHoCH / SWEEP / MSS</span>
+   </div>
+
+   <div class="connection" id="connection">Подключение к Binance...</div>
+  </section>
+  <footer>TradeVision 2.0 | ICT Engine | Binance data</footer>
+ </main>
+
+ <aside class="rightbar" id="rightbar">
+  <div class="section-title">
+   <span>WATCHLIST</span>
+   <button id="closeWatch">✕</button>
+  </div>
+  <input class="watch-search" id="watchSearch" placeholder="Фильтр валют...">
+  <div class="watchlist" id="watchlist"></div>
+
+  <div class="divider"></div>
+
+  <div class="section-title">ICT MARKET STRUCTURE</div>
+  <div class="grid">
+   <div class="metric"><small>Liquidity Sweep</small><strong id="sweep">—</strong></div>
+   <div class="metric"><small>Fair Value Gap</small><strong id="fvg">—</strong></div>
+   <div class="metric"><small>Order Blocks</small><strong id="ob">—</strong></div>
+   <div class="metric"><small>BOS</small><strong id="bos">—</strong></div>
+   <div class="metric"><small>CHoCH</small><strong id="choch">—</strong></div>
+   <div class="metric"><small>MSS</small><strong id="mss">—</strong></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="section-title">BUY / SELL SIGNALS</div>
+  <div class="grid">
+   <div class="metric">
+    <small>Направление</small>
+    <strong id="signal" class="yellow">НЕТ СИГНАЛА</strong>
+   </div>
+   <div class="metric">
+    <small>Stop Loss</small>
+    <strong id="sl">—</strong>
+   </div>
+   <div class="metric">
+    <small>Take Profit</small>
+    <strong id="tp">—</strong>
+   </div>
+  </div>
+  <div class="analysis" id="analysis">Ожидание данных.</div>
+ </aside>
+
+</div>
 
 <script>
 const $=id=>document.getElementById(id);
-let raw=[],zones=[],requestId=0;
+
+let raw=[],zones=[],allMarkers=[],requestId=0;
+let light=false;
+let showFVG=true,showOB=true,showMarkers=true,showSweep=true;
+let displayMode="ict";
 
 const chart=LightweightCharts.createChart($("chart"),{
- width:$("chart").clientWidth,height:$("chart").clientHeight,
- layout:{background:{color:"#111b2b"},textColor:"#a9bad0"},
- grid:{vertLines:{color:"#263348"},horzLines:{color:"#263348"}},
+ width:$("chart").clientWidth,
+ height:$("chart").clientHeight,
+ layout:{
+  background:{color:"#111b2b"},
+  textColor:"#a9bad0"
+ },
+ grid:{
+  vertLines:{color:"#263348"},
+  horzLines:{color:"#263348"}
+ },
  rightPriceScale:{borderColor:"#344763"},
  timeScale:{borderColor:"#344763",timeVisible:true},
  crosshair:{mode:1}
 });
 
 const candles=chart.addCandlestickSeries({
- upColor:"#00c896",downColor:"#ff536b",
- borderUpColor:"#00c896",borderDownColor:"#ff536b",
- wickUpColor:"#00c896",wickDownColor:"#ff536b"
+ upColor:"#00c896",
+ downColor:"#ff536b",
+ borderUpColor:"#00c896",
+ borderDownColor:"#ff536b",
+ wickUpColor:"#00c896",
+ wickDownColor:"#ff536b"
 });
 
-function setTheme(light){
- document.body.className=light?"light":"dark";
+function setTheme(isLight){
+ light=isLight;
+ document.body.classList.toggle("light",light);
  chart.applyOptions({
   layout:{
    background:{color:light?"#ffffff":"#111b2b"},
@@ -143,11 +319,11 @@ function setTheme(light){
   rightPriceScale:{borderColor:light?"#cbd5e1":"#344763"},
   timeScale:{borderColor:light?"#cbd5e1":"#344763"}
  });
- $("themeButton").textContent=light?"☾ Тёмная тема":"☀ Светлая тема";
+ $("themeButton").textContent=light?"☾ Тёмная":"☀ Светлая";
  drawZones();
 }
-let light=false;
-$("themeButton").onclick=()=>{light=!light;setTheme(light)};
+
+$("themeButton").onclick=()=>setTheme(!light);
 
 function detectICT(d){
  let z=[],m=[],sweep=null,fvg=null,trend=0;
@@ -233,37 +409,91 @@ function detectICT(d){
  return {zones:z.slice(-30),markers:m.slice(-100),signal,state};
 }
 
+function visibleMarkers(){
+ if(displayMode==="clean"||!showMarkers)return [];
+ return allMarkers.filter(m=>{
+  if(!showSweep&&m.text==="SWEEP")return false;
+  if(!showFVG&&m.text==="FVG")return false;
+  return true;
+ });
+}
+
+function visibleZones(){
+ if(displayMode==="clean")return [];
+ let result=zones.filter(z=>{
+  if(z.type==="FVG"&&!showFVG)return false;
+  if(z.type==="OB"&&!showOB)return false;
+  return true;
+ });
+ if(displayMode==="ict"){
+  let fvg=result.filter(z=>z.type==="FVG").slice(-5);
+  let ob=result.filter(z=>z.type==="OB").slice(-3);
+  return [...fvg,...ob];
+ }
+ return result;
+}
+
 function drawZones(){
- let canvas=$("ictOverlay"),rect=$("chart").getBoundingClientRect();
- let dpr=devicePixelRatio||1;
- canvas.width=rect.width*dpr;canvas.height=rect.height*dpr;
- canvas.style.width=rect.width+"px";canvas.style.height=rect.height+"px";
+ let canvas=$("ictOverlay");
+ let rect=$("chart").getBoundingClientRect();
+ let dpr=window.devicePixelRatio||1;
+ canvas.width=rect.width*dpr;
+ canvas.height=rect.height*dpr;
+ canvas.style.width=rect.width+"px";
+ canvas.style.height=rect.height+"px";
  let ctx=canvas.getContext("2d");
  ctx.setTransform(dpr,0,0,dpr,0,0);
  ctx.clearRect(0,0,rect.width,rect.height);
  if(!raw.length)return;
- zones.forEach(z=>{
+
+ visibleZones().forEach(z=>{
   let x1=chart.timeScale().timeToCoordinate(z.start);
   let x2=chart.timeScale().timeToCoordinate(raw[raw.length-1].time);
-  let y1=candles.priceToCoordinate(z.top),y2=candles.priceToCoordinate(z.bottom);
+  let y1=candles.priceToCoordinate(z.top);
+  let y2=candles.priceToCoordinate(z.bottom);
   if(x1===null||x2===null||y1===null||y2===null)return;
-  let bull=z.dir==="bullish",color=bull?"#00b987":"#ed526b";
-  ctx.fillStyle=bull?"rgba(0,190,135,.15)":"rgba(237,82,107,.15)";
+
+  let bull=z.dir==="bullish";
+  let color=bull?"#00b987":"#ed526b";
+  ctx.fillStyle=bull?"rgba(0,190,135,.12)":"rgba(237,82,107,.12)";
   ctx.strokeStyle=color;
-  let left=Math.max(0,x1),right=Math.min(rect.width,x2);
+
+  let left=Math.max(0,x1);
+  let right=Math.min(rect.width,x2);
   if(right<=left)return;
-  let top=Math.min(y1,y2),height=Math.abs(y2-y1);
+
+  let top=Math.min(y1,y2);
+  let height=Math.abs(y2-y1);
   ctx.fillRect(left,top,right-left,height);
   ctx.strokeRect(left,top,right-left,height);
-  ctx.fillStyle=color;ctx.font="bold 11px Arial";
-  ctx.fillText(z.type==="OB"?"ORDER BLOCK":bull?"BULLISH FVG":"BEARISH FVG",left+4,Math.max(12,top+12));
+
+  ctx.fillStyle=color;
+  ctx.font="bold 10px Arial";
+  let label=z.type==="OB"?"ORDER BLOCK":bull?"BULLISH FVG":"BEARISH FVG";
+  ctx.fillText(label,left+4,Math.max(12,top+12));
  });
+}
+
+function applyDisplay(){
+ candles.setMarkers(visibleMarkers());
+ drawZones();
+
+ $("toolFVG").classList.toggle("active",showFVG);
+ $("toolOB").classList.toggle("active",showOB);
+ $("toolMarkers").classList.toggle("active",showMarkers);
+ $("toolSweep").classList.toggle("active",showSweep);
+
+ $("modeICT").classList.toggle("active",displayMode==="ict");
+ $("modeClean").classList.toggle("active",displayMode==="clean");
+ $("modeFull").classList.toggle("active",displayMode==="full");
 }
 
 function updateICT(){
  let r=detectICT(raw);
- zones=r.zones;candles.setMarkers(r.markers);
+ zones=r.zones;
+ allMarkers=r.markers;
  Object.keys(r.state).forEach(k=>$(k).textContent=r.state[k]);
+
  let s=r.signal;
  if(s){
   $("signal").textContent=s.dir==="bullish"?"BUY":"SELL";
@@ -274,41 +504,162 @@ function updateICT(){
  }else{
   $("signal").textContent="НЕТ СИГНАЛА";
   $("signal").className="yellow";
-  $("sl").textContent="—";$("tp").textContent="—";
+  $("sl").textContent="—";
+  $("tp").textContent="—";
   $("analysis").textContent="Ожидание полного подтверждения ICT.";
  }
- drawZones();
+ applyDisplay();
 }
 
 async function loadData(){
  let id=++requestId;
- let symbol=$("symbol").value,interval=$("interval").value;
+ let symbol=$("symbol").value;
+ let interval=$("interval").value;
  $("connection").textContent="Загрузка Binance...";
+ $("chartTitle").textContent=symbol.replace("USDT"," / USDT");
+
  try{
-  let response=await fetch("https://api.binance.com/api/v3/klines?symbol="+symbol+"&interval="+interval+"&limit=500");
+  let response=await fetch(
+   "https://api.binance.com/api/v3/klines?symbol="+symbol+
+   "&interval="+interval+"&limit=500"
+  );
   if(!response.ok)throw Error("Binance HTTP "+response.status);
   let data=await response.json();
   if(id!==requestId)return;
-  raw=data.map(k=>({time:Math.floor(k[0]/1000),open:+k[1],high:+k[2],low:+k[3],close:+k[4]}));
+
+  raw=data.map(k=>({
+   time:Math.floor(k[0]/1000),
+   open:+k[1],high:+k[2],low:+k[3],close:+k[4]
+  }));
+
   candles.setData(raw);
   chart.timeScale().fitContent();
   updateICT();
+
+  if(raw.length){
+   let last=raw[raw.length-1];
+   $("priceLabel").textContent="Цена: "+last.close.toLocaleString("en-US");
+  }
   $("connection").textContent="Подключено: Binance | "+symbol+" | "+interval;
  }catch(e){
-  if(id===requestId)$("connection").textContent="Ошибка: "+e.message;
+  if(id===requestId){
+   $("connection").textContent="Ошибка загрузки: "+e.message;
+  }
  }
 }
 
-$("symbol").onchange=loadData;
+$("symbol").onchange=()=>{
+ renderWatchlist();
+ loadData();
+};
+
 $("interval").onchange=loadData;
+
+$("toolFVG").onclick=()=>{
+ showFVG=!showFVG;
+ applyDisplay();
+};
+$("toolOB").onclick=()=>{
+ showOB=!showOB;
+ applyDisplay();
+};
+$("toolMarkers").onclick=()=>{
+ showMarkers=!showMarkers;
+ applyDisplay();
+};
+$("toolSweep").onclick=()=>{
+ showSweep=!showSweep;
+ applyDisplay();
+};
+$("toolCursor").onclick=()=>{
+ chart.applyOptions({crosshair:{mode:1}});
+ $("toolCursor").classList.add("active");
+};
+
+$("modeICT").onclick=()=>{
+ displayMode="ict";
+ applyDisplay();
+};
+$("modeClean").onclick=()=>{
+ displayMode="clean";
+ applyDisplay();
+};
+$("modeFull").onclick=()=>{
+ displayMode="full";
+ applyDisplay();
+};
+$("fitButton").onclick=()=>chart.timeScale().fitContent();
+
+const watchSymbols=[
+ ["BTCUSDT","BTC / USDT"],
+ ["ETHUSDT","ETH / USDT"],
+ ["BNBUSDT","BNB / USDT"],
+ ["SOLUSDT","SOL / USDT"],
+ ["XRPUSDT","XRP / USDT"],
+ ["ADAUSDT","ADA / USDT"],
+ ["DOGEUSDT","DOGE / USDT"],
+ ["LTCUSDT","LTC / USDT"],
+ ["LINKUSDT","LINK / USDT"],
+ ["AVAXUSDT","AVAX / USDT"],
+ ["TRXUSDT","TRX / USDT"],
+ ["DOTUSDT","DOT / USDT"],
+ ["BCHUSDT","BCH / USDT"],
+ ["TONUSDT","TON / USDT"],
+ ["ETCUSDT","ETC / USDT"],
+ ["NEARUSDT","NEAR / USDT"],
+ ["APTUSDT","APT / USDT"],
+ ["SUIUSDT","SUI / USDT"]
+];
+
+function renderWatchlist(filter=""){
+ let list=$("watchlist");
+ list.innerHTML="";
+ watchSymbols
+ .filter(item=>item[0].toLowerCase().includes(filter.toLowerCase())||
+               item[1].toLowerCase().includes(filter.toLowerCase()))
+ .forEach(item=>{
+  let button=document.createElement("button");
+  button.className="market"+(item[0]===$("symbol").value?" selected":"");
+  button.innerHTML="<span>"+item[1]+"</span><small>USDT</small>";
+  button.onclick=()=>{
+   $("symbol").value=item[0];
+   renderWatchlist($("watchSearch").value);
+   loadData();
+   if(window.innerWidth<=850)$("rightbar").classList.remove("open");
+  };
+  list.appendChild(button);
+ });
+}
+
+$("watchSearch").oninput=e=>renderWatchlist(e.target.value);
+
+$("pairSearch").oninput=e=>{
+ let q=e.target.value.trim().toUpperCase().replace("/","");
+ let match=watchSymbols.find(x=>
+  x[0].startsWith(q)||x[1].replaceAll(" ","").startsWith(q)
+ );
+ if(match){
+  $("symbol").value=match[0];
+  renderWatchlist($("watchSearch").value);
+ }
+};
+
+$("watchButton").onclick=()=>$("rightbar").classList.toggle("open");
+$("closeWatch").onclick=()=>$("rightbar").classList.remove("open");
+
 chart.timeScale().subscribeVisibleTimeRangeChange(drawZones);
 
 if(window.ResizeObserver){
  new ResizeObserver(()=>{
-  chart.applyOptions({width:$("chart").clientWidth,height:$("chart").clientHeight});
+  chart.applyOptions({
+   width:$("chart").clientWidth,
+   height:$("chart").clientHeight
+  });
   drawZones();
  }).observe($("chart"));
 }
+
+renderWatchlist();
 loadData();
 </script>
 </body>
